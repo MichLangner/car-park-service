@@ -19,7 +19,7 @@ public class AdminController {
     public ResponseEntity<CarParksIdDto> parkingIdentifierResponseEntity(){
 
     ParkingIdentifier parkingIdentifier = new ParkingIdentifier(UUID.randomUUID().toString());
-    return ResponseEntity.created(URI.create("/parkings/" + parkingIdentifier.rawValue())).body(new CarParksIdDto());
+    return ResponseEntity.created(URI.create("/parkings/" + parkingIdentifier.rawValue())).body(new CarParksIdDto(parkingIdentifier.rawValue()));
 
 }
 
