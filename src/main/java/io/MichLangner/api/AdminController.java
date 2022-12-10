@@ -1,26 +1,47 @@
 package io.MichLangner.api;
 
 
-import io.MichLangner.api.dto.CarParksIdDto;
-import io.MichLangner.domain.ParkingIdentifier;
+import io.MichLangner.domain.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
-import java.util.UUID;
+
 @RequestMapping(value = "/admin")
 @RestController
 public class AdminController {
 
-@PostMapping(value = "/parkings")
-    public ResponseEntity<CarParksIdDto> parkingIdentifierResponseEntity(){
+    private final ParkingService parkingService;
 
-    ParkingIdentifier parkingIdentifier = new ParkingIdentifier(UUID.randomUUID().toString());
-    return ResponseEntity.created(URI.create("/parkings/" + parkingIdentifier.rawValue())).body(new CarParksIdDto(parkingIdentifier.rawValue()));
+    public AdminController(ParkingService parkingService) {
+        this.parkingService = parkingService;
+    }
 
-}
+
+    @PostMapping(value = "/parkings")
+    public ResponseEntity<Parking> addParking(@Valid @RequestBody CarParkingRequest carParkingRequest) {
+        Parking parking = parkingService.createParking(new ParkingCoordinates(carParkingRequest.getParkingLatitude()
+                        , carParkingRequest.getParkingLongitude())
+                , new ParkingLocation(carParkingRequest.getParkingStreet()
+                        , carParkingRequest.getParkingNumber())
+                , carParkingRequest.getParkingName());
+        return ResponseEntity.created(URI.create("/parkings" + parking.getParkingId().rawValue())).body(parking);
+
+    }
+
+    @PatchMapping(value = "parkigns/{parkingId}")
+    public ResponseEntity<Parking> updateParkingValues(@PathVariable String parkingId,
+                                                       @RequestParam String parkingName) {
+        ParkingId parkingId1 = new ParkingId(parkingId);
+        return ResponseEntity.ok().body(parkingService.updateParking(parkingId1, parkingName));
+
+    }
+    @DeleteMapping(value = "/parkings/{parkingId}")
+    public ResponseEntity<Parking> deleteParkingValues(@PathVariable String parkingId){
+        ParkingId parkingId1 = new ParkingId(parkingId);
+        parkingService.deleteParking(parkingId1);
+        return ResponseEntity.noContent().build();
+    }
 
 }

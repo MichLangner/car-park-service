@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://Michal:nS4o9xbtp1ktyZpY@sda-training.t0rbegr.mongodb.net/?retryWrites=true&w=majority
+      database: "carParkings"
+
+logging:
+  level:
+    root: debug
